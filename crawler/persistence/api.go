@@ -5,12 +5,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetPage(db *gorm.DB, url string) (*Page, error) {
-
+func GetPage(db *gorm.DB, url string, dataset string) (*Page, error) {
 	var page Page
 
-	// SELECT FIRST FROM Pages WHERE url = url
-	result := db.First(&page, "url = ?", url)
+	result := db.First(&page, "url = ? AND dataset = ?", url, dataset)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -23,14 +21,18 @@ func GetPage(db *gorm.DB, url string) (*Page, error) {
 }
 
 // CreatePage creates a new page entry in the database
-func CreatePage(db *gorm.DB, url string) (*Page, error) {
-
+func CreatePage(db *gorm.DB, url string, dataset string) (*Page, error) {
 	if url == "" {
-    	return nil, errors.New("url cannot be empty")
+		return nil, errors.New("url cannot be empty")
+	}
+
+	if dataset == "" {
+		return nil, errors.New("dataset cannot be empty")
 	}
 
 	page := Page{
-		URL: url,
+		URL:     url,
+		Dataset: dataset,
 	}
 
 	result := db.Create(&page)
@@ -41,19 +43,25 @@ func CreatePage(db *gorm.DB, url string) (*Page, error) {
 	return &page, nil
 }
 
-
 /*
 * GetOrCreatePage Gets the page at url
 * If the page does not exist, it will create it and return the page
 */
-func GetOrCreatePage(db *gorm.DB, url string) (*Page, error) {
+func GetOrCreatePage(db *gorm.DB, url string, dataset string) (*Page, error) {
 	if url == "" {
 		return nil, errors.New("url cannot be empty")
 	}
 
-	page := Page{URL: url}
+	if dataset == "" {
+		return nil, errors.New("dataset cannot be empty")
+	}
 
-	result := db.Where("url = ?", url).FirstOrCreate(&page)
+	page := Page{
+		URL:     url,
+		Dataset: dataset,
+	}
+
+	result := db.Where("url = ? AND dataset = ?", url, dataset).FirstOrCreate(&page)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -70,7 +78,6 @@ func UpdatePageTitle(db *gorm.DB, pageID uint, title string) error {
 	return result.Error
 }
 
-
 // UpdatePageRank updates the pageRank of page with ID pageID
 func UpdatePageRank(db *gorm.DB, pageID uint, pageRank float64) error {
 	result := db.Model(&Page{}).
@@ -80,16 +87,14 @@ func UpdatePageRank(db *gorm.DB, pageID uint, pageRank float64) error {
 	return result.Error
 }
 
-
 // UpdatePage updates multiple values of page record
-func UpdatePage(db *gorm.DB, pageID uint, updates map[string] any) error {
+func UpdatePage(db *gorm.DB, pageID uint, updates map[string]any) error {
 	result := db.Model(&Page{}).
 		Where("id = ?", pageID).
 		Updates(updates)
 
 	return result.Error
 }
-
 
 // DeletePage safely deletes a page and removes related links and word counts
 func DeletePage(db *gorm.DB, pageID uint) error {
@@ -155,7 +160,7 @@ func GetIncomingLinks(db *gorm.DB, pageID uint) ([]Link, error) {
 }
 
 // Saves/Updates the word count map of page with ID pageID
-func SaveWordCounts(db *gorm.DB, pageID uint, counts map[string] uint) error {
+func SaveWordCounts(db *gorm.DB, pageID uint, counts map[string]uint) error {
 	tx := db.Begin()
 	if tx.Error != nil {
 		return tx.Error
