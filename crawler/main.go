@@ -1,52 +1,38 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"sort"
 
 	"crawler/crawl"
-	"crawler/parser"
+	"crawler/persistence"
+	"crawler/util"
 )
 
 func main() {
-	pageURL := "https://people.scs.carleton.ca/~avamckenney/fruitsA/N-0.html"
 
-	body, err := crawl.FetchPage(pageURL)
+	config, err := util.LoadConfig("../config.yml")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	parsed, err := parser.ParsePage(pageURL, body)
+	db, err := persistence.InitalizeDatabase(
+		config.SearchEngine.Database.StoragePath,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("==== PARSER TEST ====")
-	fmt.Println("URL:", parsed.URL)
-	fmt.Println("Title:", parsed.Title)
-	fmt.Println("Total Links:", len(parsed.Links))
-	fmt.Println("Total Unique Words:", len(parsed.WordCounts))
-	fmt.Println()
+	crawler := crawl.NewCrawler(
+		db,
+		config.SearchEngine.Crawler.StartURL,
+		"fruitsA",
+		config.SearchEngine.Crawler.CrawlLimit,
+		config.SearchEngine.Crawler.MaxWorkers,
+	)
 
-	fmt.Println("First 10 Links:")
-	linkLimit := min(10, len(parsed.Links))
-	for i := 0; i < linkLimit; i++ {
-		fmt.Printf("%d. %s\n", i+1, parsed.Links[i])
+	if err := crawler.Crawl(); err != nil {
+		log.Fatal(err)
 	}
-	fmt.Println()
 
-	fmt.Println("Sample Word Counts:")
-	words := make([]string, 0, len(parsed.WordCounts))
-	for word := range parsed.WordCounts {
-		words = append(words, word)
-	}
-	sort.Strings(words)
-
-	wordLimit := min(10, len(words))
-	for i := 0; i < wordLimit; i++ {
-		word := words[i]
-		fmt.Printf("%s: %d\n", word, parsed.WordCounts[word])
-	}
+	log.Println("crawler finished successfully")
 }
-

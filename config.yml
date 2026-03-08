@@ -1,10 +1,12 @@
 search-engine:
   version: alpha-v1
   
-  cralwer:
+  crawler:
     start-url: "https://people.scs.carleton.ca/~avamckenney/fruitsA/N-0.html"
-    custom-url: 
-    CRAWL_LIMIT: 2500
+    custom-url: "https://go.dev/doc/"
+    crawl-limit: 2500
+    min-workers: 1
+    max-workers: 8
 
   database:
-    storage-path: SearchEngine/data/search_data.db
+    storage-path: "../data/search_data.db"

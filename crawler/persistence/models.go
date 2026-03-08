@@ -1,14 +1,15 @@
 package persistence
 
 type Page struct {
-	ID       uint				`gorm:"primaryKey"`
-	URL      string				`gorm:"uniqueIndex;not null"`
+	ID       uint    `gorm:"primaryKey"`
+	URL      string  `gorm:"not null;index:idx_url_dataset,unique"`
+	Dataset  string  `gorm:"not null;index:idx_url_dataset,unique;index"`
 	Title    string
-	PageRank float64			`gorm:"default:0"`
-	Dataset  string				`gorm:"index;not null"`
-	OutgoingLinks []Link      	`gorm:"foreignKey:FromPageID"`
-	IncomingLinks []Link      	`gorm:"foreignKey:ToPageID"`
-	WordCounts    []WordCount 	`gorm:"foreignKey:PageID"`
+	PageRank float64 `gorm:"default:0"`
+
+	OutgoingLinks []Link      `gorm:"foreignKey:FromPageID"`
+	IncomingLinks []Link      `gorm:"foreignKey:ToPageID"`
+	WordCounts    []WordCount `gorm:"foreignKey:PageID"`
 }
 
 type Link struct {
