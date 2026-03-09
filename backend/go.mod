@@ -5,6 +5,7 @@ go 1.25.0
 require (
 	github.com/PuerkitoBio/goquery v1.11.0
 	github.com/goccy/go-yaml v1.19.2
+	gonum.org/v1/gonum v0.17.0
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.31.1
 )

@@ -124,6 +124,10 @@ func DeletePage(db *gorm.DB, pageID uint) error {
 
 // CreateLink creates a link from page with Id fromID to page with ID toID
 func CreateLink(db *gorm.DB, fromID uint, toID uint) error {
+	if fromID == toID {
+		return nil
+	}
+
 	link := Link{
 		FromPageID: fromID,
 		ToPageID:   toID,

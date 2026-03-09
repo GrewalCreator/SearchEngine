@@ -26,11 +26,13 @@ type SearchEngineConfig struct {
  * CrawlerConfig contains crawler runtime parameters.
  */
 type CrawlerConfig struct {
-	StartURL   string `yaml:"start-url"`
-	CustomURL  string `yaml:"custom-url"`
-	CrawlLimit int    `yaml:"crawl-limit"`
-	MinWorkers int    `yaml:"min-workers"`
-	MaxWorkers int    `yaml:"max-workers"`
+	StartURL	string	`yaml:"start-url"`
+	CustomURL	string	`yaml:"custom-url"`
+	CrawlLimit	int    	`yaml:"crawl-limit"`
+	MinWorkers	int    	`yaml:"min-workers"`
+	MaxWorkers	int    	`yaml:"max-workers"`
+	Damping		float64	`yaml:"damping"`
+    Iterations	int		`yaml:"iterations"`
 }
 
 /**

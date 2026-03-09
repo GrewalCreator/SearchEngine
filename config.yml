@@ -3,10 +3,12 @@ search-engine:
   
   crawler:
     start-url: "https://people.scs.carleton.ca/~avamckenney/fruitsA/N-0.html"
-    custom-url: "https://go.dev/doc/"
-    crawl-limit: 2500
+    custom-url: "https://wiki.archlinux.org/title/Main_page"
+    crawl-limit: 600
     min-workers: 1
     max-workers: 8
+    damping: 0.85
+    iterations: 30
 
   database:
     storage-path: "../data/search_data.db"

@@ -30,6 +30,8 @@ func InitalizeDatabase(dbPath string) (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to create database directory: %w", err)
 	}
 
+	fmt.Println("DB PATH:", absPath)
+	
 	db, err := gorm.Open(sqlite.Open(absPath), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
